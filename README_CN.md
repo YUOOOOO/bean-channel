@@ -1,6 +1,6 @@
 # Bean Channel
 
-强大的 OpenClaw Discord 频道插件，作为 Discord 机器人与 OpenClaw 之间的中间层代理。支持智能消息过滤、实时网页配置和无缝多机器人管理。
+OpenClaw 的 Discord 频道插件，提供网页配置界面和智能消息过滤。
 
 [English](./README.md)
 
@@ -25,26 +25,24 @@ npm run config
 
 ## 安装步骤
 
-### 方法一：作为 OpenClaw 插件安装
+Bean Channel 是独立运行的服务。即使作为 OpenClaw 插件安装，也需要单独运行。
+
+### 第一步：构建项目
 
 ```bash
-# 安装依赖并构建
 npm install
 npm run build
-
-# 安装到 OpenClaw
-openclaw plugins install /path/to/bean-channel
 ```
 
-### 方法二：独立运行模式
+### 第二步：启动配置服务器
 
 ```bash
-npm install
-npm run build
 npm run config
 ```
 
-访问 http://localhost:3000 进行配置。
+这会在 http://localhost:3000 启动网页配置界面
+
+### 第三步：网页配置
 
 1. 打开 http://localhost:3000
 2. 添加 AI 模型（可选，用于 AI 意图识别）
@@ -52,11 +50,25 @@ npm run config
 4. 配置过滤模式：
    - **关键词模式**：简单关键词匹配
    - **AI 模式**：智能意图识别，需设置 Bot 职责
-5. 保存并获取 OpenClaw token
+5. 保存并复制 OpenClaw token
 
-### 4. 连接到 OpenClaw
+### 第四步：连接到 OpenClaw
 
-在 OpenClaw 配置中添加：
+**方式 A：作为插件安装**
+
+```bash
+# 链接到 OpenClaw 的 channels 目录
+cd /path/to/openclaw/channels
+ln -s /path/to/bean-channel bean-channel
+```
+
+**方式 B：独立使用**
+
+无需安装，直接配置 OpenClaw 连接即可。
+
+**OpenClaw 配置：**
+
+在 OpenClaw 配置文件中添加：
 
 ```json
 {
@@ -64,11 +76,15 @@ npm run config
     "type": "bean-channel",
     "config": {
       "serverUrl": "ws://localhost:3000/openclaw",
-      "token": "从网页获取的-token"
+      "token": "第三步获取的-token"
     }
   }]
 }
 ```
+
+### 第五步：启动 OpenClaw
+
+OpenClaw 会通过 WebSocket 连接到 Bean Channel。确保 Bean Channel 的配置服务器正在运行。
 
 ## Discord 机器人设置
 

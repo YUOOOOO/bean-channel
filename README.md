@@ -1,6 +1,6 @@
 # Bean Channel
 
-A powerful Discord channel plugin for OpenClaw that acts as a middleware proxy between Discord bots and OpenClaw. Features intelligent message filtering, real-time web configuration, and seamless multi-bot management.
+Discord channel plugin for OpenClaw with web configuration interface and intelligent message filtering.
 
 [中文文档](./README_CN.md)
 
@@ -25,26 +25,24 @@ Open http://localhost:3000 to configure.
 
 ## Installation
 
-### Method 1: Install as OpenClaw Plugin
+Bean Channel runs as an independent service. Even when installed as an OpenClaw plugin, it needs to run separately.
+
+### Step 1: Build the Project
 
 ```bash
-# Install dependencies and build
 npm install
 npm run build
-
-# Install to OpenClaw
-openclaw plugins install /path/to/bean-channel
 ```
 
-### Method 2: Standalone Mode
+### Step 2: Start Configuration Server
 
 ```bash
-npm install
-npm run build
 npm run config
 ```
 
-Open http://localhost:3000 to configure.
+This starts the web interface at http://localhost:3000
+
+### Step 3: Configure via Web Interface
 
 1. Open http://localhost:3000
 2. Add AI models (optional, for AI intent recognition)
@@ -52,11 +50,25 @@ Open http://localhost:3000 to configure.
 4. Configure filtering mode:
    - **Keyword Mode**: Simple keyword matching
    - **AI Mode**: Intelligent intent recognition with bot role
-5. Save and get OpenClaw tokens
+5. Save and copy the OpenClaw token
 
-### 4. Connect to OpenClaw
+### Step 4: Connect to OpenClaw
 
-Add to OpenClaw config:
+**Option A: Install as Plugin**
+
+```bash
+# Link to OpenClaw channels directory
+cd /path/to/openclaw/channels
+ln -s /path/to/bean-channel bean-channel
+```
+
+**Option B: Use Standalone**
+
+No installation needed, just configure OpenClaw to connect.
+
+**OpenClaw Configuration:**
+
+Add to OpenClaw config file:
 
 ```json
 {
@@ -64,11 +76,15 @@ Add to OpenClaw config:
     "type": "bean-channel",
     "config": {
       "serverUrl": "ws://localhost:3000/openclaw",
-      "token": "your-token-from-web-interface"
+      "token": "your-token-from-step-3"
     }
   }]
 }
 ```
+
+### Step 5: Start OpenClaw
+
+OpenClaw will connect to Bean Channel via WebSocket. Make sure Bean Channel's config server is running.
 
 ## Discord Bot Setup
 
