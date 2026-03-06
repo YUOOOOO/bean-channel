@@ -3,3 +3,4 @@ dist/
 config.json
 *.log
 .DS_Store
+.claude/

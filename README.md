@@ -96,6 +96,16 @@ Add to OpenClaw config:
 - Node.js 18+
 - Discord bot with MESSAGE CONTENT intent enabled
 
+## Testing
+
+Use the included OpenClaw simulator for testing without a real OpenClaw instance:
+
+```bash
+node test-openclaw.js
+```
+
+The simulator will connect to the Bean Channel server and echo back any messages it receives.
+
 ## License
 
 MIT

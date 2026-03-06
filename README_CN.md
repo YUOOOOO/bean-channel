@@ -96,6 +96,16 @@ npm run config
 - Node.js 18+
 - Discord 机器人需开启 MESSAGE CONTENT intent
 
+## 测试
+
+使用内置的 OpenClaw 模拟器进行测试，无需真实的 OpenClaw 实例：
+
+```bash
+node test-openclaw.js
+```
+
+模拟器会连接到 Bean Channel 服务器并回显收到的消息。
+
 ## 许可证
 
 MIT
