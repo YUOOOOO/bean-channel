@@ -1,6 +1,6 @@
 # Bean Channel
 
-A powerful Discord channel plugin for OpenClaw that bridges Discord bots with AI agents. Features intelligent message filtering, real-time web configuration, and seamless multi-bot management.
+A powerful Discord channel plugin for OpenClaw that acts as a middleware proxy between Discord bots and OpenClaw. Features intelligent message filtering, real-time web configuration, and seamless multi-bot management.
 
 [中文文档](./README_CN.md)
 

@@ -1,6 +1,6 @@
 # Bean Channel
 
-强大的 OpenClaw Discord 频道插件，连接 Discord 机器人与 AI 代理。支持智能消息过滤、实时网页配置和无缝多机器人管理。
+强大的 OpenClaw Discord 频道插件，作为 Discord 机器人与 OpenClaw 之间的中间层代理。支持智能消息过滤、实时网页配置和无缝多机器人管理。
 
 [English](./README.md)
 
