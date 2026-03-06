@@ -1,0 +1,30 @@
+{
+  "name": "bean-channel",
+  "version": "1.0.0",
+  "description": "Discord channel plugin for OpenClaw",
+  "type": "channel",
+  "main": "dist/index.js",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "bots": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "botId": {
+              "type": "string",
+              "description": "Unique bot identifier"
+            },
+            "discordToken": {
+              "type": "string",
+              "description": "Discord bot token"
+            }
+          },
+          "required": ["botId", "discordToken"]
+        }
+      }
+    },
+    "required": ["bots"]
+  }
+}

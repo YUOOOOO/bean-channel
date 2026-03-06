@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bean Channel 配置</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .card h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.5em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .help {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+    .bot-item {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      transition: all 0.3s;
+    }
+    .bot-item:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+    .bot-item.connected { border-color: #28a745; background: #f0fff4; }
+    .bot-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .bot-status.connected { background: #28a745; color: white; }
+    .bot-status.disconnected { background: #dc3545; color: white; }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 2px solid #e9ecef;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    button {
+      padding: 12px 24px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    .token {
+      background: #f8f9fa;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      word-break: break-all;
+      border-left: 4px solid #667eea;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .token-value {
+      flex: 1;
+      margin-right: 10px;
+    }
+    .token-hidden {
+      filter: blur(8px);
+      user-select: none;
+    }
+    .eye-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 5px;
+    }
+    .log {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      border-radius: 8px;
+      line-height: 1.6;
+    }
+    .log-item { margin: 5px 0; }
+    .log-system { color: #ffd700; }
+    .log-message { color: #4ec9b0; }
+    .log-error { color: #f48771; }
+    .log-success { color: #7ec699; }
+    .status {
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+    .status.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+    .status.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+    .status.info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+    .button-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    label { display: block; margin-top: 10px; color: #333; font-weight: 500; }
+    select { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #e9ecef; border-radius: 6px; font-size: 14px; }
+    .tab {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .tab.active { background: white; color: #667eea; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .filter-section {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+    .filter-section h3 {
+      color: #667eea;
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 10px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-family: inherit;
+      resize: vertical;
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #2d2d2d; }
+    ::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Bean Channel</h1>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('bot-config')">Bot 配置</div>
+      <div class="tab" onclick="switchTab('ai-config')">AI 模型</div>
+      <div class="tab" onclick="switchTab('logs')">日志</div>
+    </div>
+
+    <div id="bot-config" class="tab-content active">
+
+    <div class="card">
+      <h2>🤖 Discord 机器人配置</h2>
+      <p class="help">
+        添加你的 Discord 机器人。每个机器人需要唯一的 ID 和 Discord Token。<br>
+        <strong>重要：</strong>必须在 <a href="https://discord.com/developers/applications" target="_blank">Discord 开发者门户</a> 开启 <strong>MESSAGE CONTENT INTENT</strong>
+      </p>
+
+      <div id="bots"></div>
+
+      <div class="button-group">
+        <button class="btn-primary" onclick="addBot()">➕ 添加机器人</button>
+        <button class="btn-success" onclick="saveConfig()">💾 保存并连接</button>
+        <button class="btn-danger" onclick="disconnectAll()">🔌 断开所有连接</button>
+      </div>
+
+      <div id="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>🔑 生成的 Token</h2>
+      <p class="help">这些 token 用于 OpenClaw 连接到 Bean Channel（测试时不需要）。</p>
+      <div id="tokens"></div>
+    </div>
+    </div>
+
+    <div id="ai-config" class="tab-content">
+      <div class="card">
+        <h2>🤖 AI 模型配置</h2>
+        <p class="help">配置 AI 模型用于意图识别。配置后可在 Bot 的话题过滤中使用。</p>
+
+        <div id="aiModels"></div>
+
+        <h3 style="margin-top: 20px; color: #667eea;">➕ 添加新模型</h3>
+        <label>模型名称：</label>
+        <input type="text" id="newModelName" placeholder="GPT-4o Mini">
+
+        <label>提供商：</label>
+        <select id="newModelProvider">
+          <option value="openai">OpenAI</option>
+          <option value="anthropic">Anthropic</option>
+          <option value="custom">自定义</option>
+        </select>
+
+        <label>Base URL（可选，自定义提供商需要）：</label>
+        <input type="text" id="newModelBaseUrl" placeholder="https://api.example.com/v1/chat/completions">
+
+        <label>API Key：</label>
+        <input type="password" id="newModelApiKey" placeholder="sk-...">
+
+        <label>模型：</label>
+        <input type="text" id="newModelModel" placeholder="gpt-4o-mini">
+
+        <label>超时时间（秒）：</label>
+        <input type="number" id="newModelTimeout" value="5" min="1" max="30">
+
+        <div class="button-group">
+          <button class="btn-primary" onclick="addAIModel()">➕ 添加模型</button>
+        </div>
+        <div id="aiStatus"></div>
+      </div>
+    </div>
+
+    <div id="logs" class="tab-content">
+      <div class="card">
+        <h2>📝 消息日志</h2>
+        <p class="help">实时显示来自 Discord 的消息。给你的机器人发消息来测试连接。</p>
+        <div class="log" id="log"></div>
+        <div class="button-group" style="margin-top: 15px;">
+          <button class="btn-secondary" onclick="clearLog()">🗑️ 清空日志</button>
+          <button class="btn-primary" onclick="saveLog()">💾 保存日志</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let bots = [];
+    let ws = null;
+    let logHistory = [];
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    let aiModels = [];
+
+    async function addAIModel() {
+      const model = {
+        name: document.getElementById('newModelName').value,
+        provider: document.getElementById('newModelProvider').value,
+        baseUrl: document.getElementById('newModelBaseUrl').value,
+        apiKey: document.getElementById('newModelApiKey').value,
+        model: document.getElementById('newModelModel').value,
+        timeout: parseInt(document.getElementById('newModelTimeout').value)
+      };
+
+      if (!model.name || !model.apiKey || !model.model) {
+        document.getElementById('aiStatus').innerHTML = '<div class="status error">❌ 请填写必填项</div>';
+        return;
+      }
+
+      const response = await fetch('/api/ai-models', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(model)
+      });
+
+      if (response.ok) {
+        document.getElementById('aiStatus').innerHTML = '<div class="status success">✅ 模型已添加</div>';
+        document.getElementById('newModelName').value = '';
+        document.getElementById('newModelBaseUrl').value = '';
+        document.getElementById('newModelApiKey').value = '';
+        document.getElementById('newModelModel').value = '';
+        loadAIModels();
+      } else {
+        document.getElementById('aiStatus').innerHTML = '<div class="status error">❌ 添加失败</div>';
+      }
+    }
+
+    async function deleteAIModel(id) {
+      if (!confirm('确定删除此模型？')) return;
+      await fetch(`/api/ai-models/${id}`, { method: 'DELETE' });
+      loadAIModels();
+    }
+
+    async function loadAIModels() {
+      const response = await fetch('/api/ai-models');
+      aiModels = await response.json();
+      renderAIModels();
+      render();
+    }
+
+    function renderAIModels() {
+      const container = document.getElementById('aiModels');
+      container.innerHTML = aiModels.length === 0 ? '<p style="color: #666;">暂无配置的模型</p>' : aiModels.map(m => `
+        <div class="bot-item">
+          <strong>${m.name}</strong> (${m.provider})
+          <div style="font-size: 12px; color: #666; margin: 5px 0;">模型: ${m.model}</div>
+          <button class="btn-danger" onclick="deleteAIModel('${m.id}')">删除</button>
+        </div>
+      `).join('');
+    }
+
+    function connectWebSocket() {
+      ws = new WebSocket('ws://localhost:3000/ws');
+
+      ws.onopen = () => {
+        addLogSystem('WebSocket 已连接');
+      };
+
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        if (msg.type === 'connected') {
+          addLogSystem(`机器人 [${msg.botId}] 已连接到 Discord`);
+          updateBotStatus(msg.botId, true);
+        } else if (msg.type === 'openclaw_reply') {
+          addLogOpenClaw(msg);
+        } else if (msg.type === 'topic_filtered') {
+          addLogError(`[${msg.botId}] 消息已过滤: ${msg.content}`);
+        } else if (msg.type === 'queued') {
+          addLogSystem(`[${msg.botId}] 消息已加入队列: ${msg.content}`);
+        } else if (msg.type === 'reply_cancelled') {
+          addLogSystem(`[${msg.botId}] 回复已取消，重新生成中...`);
+        } else if (msg.type === 'processing_queue') {
+          addLogSystem(`[${msg.botId}] 处理队列中的 ${msg.count} 条消息`);
+        } else {
+          addLog(msg);
+        }
+      };
+
+      ws.onerror = () => {
+        addLogError('WebSocket 连接错误');
+      };
+
+      ws.onclose = () => {
+        addLogSystem('WebSocket 已断开，3秒后重连...');
+        setTimeout(connectWebSocket, 3000);
+      };
+    }
+
+    function addLog(msg) {
+      const log = document.getElementById('log');
+      const time = new Date(msg.timestamp).toLocaleString('zh-CN');
+      const text = `[${time}] [${msg.botId}] ${msg.type} 来自 ${msg.userId}: ${msg.content}`;
+      log.innerHTML += `<div class="log-item log-message">${text}</div>`;
+      log.scrollTop = log.scrollHeight;
+      logHistory.push({ time: new Date(), text });
+    }
+
+    function addLogOpenClaw(msg) {
+      const log = document.getElementById('log');
+      const time = new Date().toLocaleString('zh-CN');
+      const text = `[${time}] [${msg.botId}] OpenClaw 回复: ${msg.content}`;
+      log.innerHTML += `<div class="log-item log-success">${text}</div>`;
+      log.scrollTop = log.scrollHeight;
+      logHistory.push({ time: new Date(), text });
+    }
+
+    function addLogSystem(text) {
+      const log = document.getElementById('log');
+      const time = new Date().toLocaleString('zh-CN');
+      const fullText = `[${time}] [系统] ${text}`;
+      log.innerHTML += `<div class="log-item log-system">${fullText}</div>`;
+      log.scrollTop = log.scrollHeight;
+      logHistory.push({ time: new Date(), text: fullText });
+    }
+
+    function addLogError(text) {
+      const log = document.getElementById('log');
+      const time = new Date().toLocaleString('zh-CN');
+      const fullText = `[${time}] [错误] ${text}`;
+      log.innerHTML += `<div class="log-item log-error">${fullText}</div>`;
+      log.scrollTop = log.scrollHeight;
+      logHistory.push({ time: new Date(), text: fullText });
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+      logHistory = [];
+    }
+
+    function saveLog() {
+      const content = logHistory.map(l => l.text).join('\n');
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `bean-channel-log-${new Date().toISOString().slice(0,10)}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showStatus('日志已保存', 'success');
+    }
+
+    function updateBotStatus(botId, connected) {
+      const bot = bots.find(b => b.botId === botId);
+      if (bot) {
+        bot.connected = connected;
+        render();
+      }
+    }
+
+    function showStatus(message, type) {
+      const status = document.getElementById('status');
+      status.innerHTML = `<div class="status ${type}">${message}</div>`;
+      setTimeout(() => status.innerHTML = '', 5000);
+    }
+
+    function addBot() {
+      const id = Date.now().toString();
+      bots.push({ id, botId: '', discordToken: '', connected: false, showToken: false });
+      render();
+    }
+
+    function toggleBotToken(id) {
+      const bot = bots.find(b => b.id === id);
+      if (bot) {
+        bot.showToken = !bot.showToken;
+        render();
+      }
+    }
+
+    function removeBot(id) {
+      bots = bots.filter(b => b.id !== id);
+      render();
+    }
+
+    function render() {
+      const container = document.getElementById('bots');
+      container.innerHTML = bots.map(bot => {
+        const modelOptions = aiModels.map(m =>
+          `<option value="${m.id}" ${bot.topicFilter?.aiSettings?.modelId === m.id ? 'selected' : ''}>${m.name}</option>`
+        ).join('');
+
+        return `
+        <div class="bot-item ${bot.connected ? 'connected' : ''}">
+          <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <strong>${bot.botId || '未命名'}</strong>
+            <span class="bot-status ${bot.connected ? 'connected' : 'disconnected'}">
+              ${bot.connected ? '● 已连接' : '○ 未连接'}
+            </span>
+          </div>
+          <input placeholder="Bot ID（例如：bot1）" value="${bot.botId}"
+                 onchange="updateBot('${bot.id}', 'botId', this.value)">
+          <div style="position: relative;">
+            <input type="${bot.showToken ? 'text' : 'password'}"
+                   placeholder="Discord Token"
+                   value="${bot.discordToken}"
+                   onchange="updateBot('${bot.id}', 'discordToken', this.value)"
+                   style="padding-right: 40px;">
+            <button class="eye-btn"
+                    style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"
+                    onclick="toggleBotToken('${bot.id}')">
+              ${bot.showToken ? '🙈' : '👁️'}
+            </button>
+          </div>
+          <div class="button-group">
+            <button class="btn-danger" onclick="removeBot('${bot.id}')">删除</button>
+            ${bot.connected
+              ? `<button class="btn-secondary" onclick="disconnectBot('${bot.botId}')">断开连接</button>`
+              : `<button class="btn-success" onclick="connectBot('${bot.id}')">连接</button>`
+            }
+          </div>
+
+          <div class="filter-section">
+            <h3>🎯 话题过滤</h3>
+            <label>过滤模式：</label>
+            <select onchange="updateBotFilter('${bot.id}', 'mode', this.value)">
+              <option value="keyword" ${!bot.topicFilter || bot.topicFilter.mode === 'keyword' ? 'selected' : ''}>关键词匹配</option>
+              <option value="ai" ${bot.topicFilter?.mode === 'ai' ? 'selected' : ''}>AI 意图识别</option>
+            </select>
+
+            <div id="keyword-${bot.id}" style="display: ${!bot.topicFilter || bot.topicFilter.mode === 'keyword' ? 'block' : 'none'}; margin-top: 10px;">
+              <label>关键词（每行一个）：</label>
+              <textarea onchange="updateBotFilter('${bot.id}', 'keywords', this.value.split('\\n').filter(k => k.trim()))">${(bot.topicFilter?.keywords || []).join('\n')}</textarea>
+            </div>
+
+            <div id="ai-${bot.id}" style="display: ${bot.topicFilter?.mode === 'ai' ? 'block' : 'none'}; margin-top: 10px;">
+              <label>Bot 职责：</label>
+              <input type="text" value="${bot.topicFilter?.aiSettings?.role || ''}" placeholder="例如：管家、作家、码农"
+                     onchange="updateBotFilterAI('${bot.id}', 'role', this.value)">
+
+              <label>AI 模型：</label>
+              <select onchange="updateBotFilterAI('${bot.id}', 'modelId', this.value)">
+                <option value="">请选择模型</option>
+                ${modelOptions}
+              </select>
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('');
+    }
+
+    function updateBot(id, field, value) {
+      const bot = bots.find(b => b.id === id);
+      if (bot) bot[field] = value;
+    }
+
+    function updateBotFilter(id, field, value) {
+      const bot = bots.find(b => b.id === id);
+      if (!bot) return;
+      if (!bot.topicFilter) bot.topicFilter = { mode: 'keyword', keywords: [] };
+      bot.topicFilter[field] = value;
+      if (field === 'mode') {
+        document.getElementById(`keyword-${id}`).style.display = value === 'keyword' ? 'block' : 'none';
+        document.getElementById(`ai-${id}`).style.display = value === 'ai' ? 'block' : 'none';
+      }
+    }
+
+    function updateBotFilterAI(id, field, value) {
+      const bot = bots.find(b => b.id === id);
+      if (!bot) return;
+      if (!bot.topicFilter) bot.topicFilter = { mode: 'ai', keywords: [] };
+      if (!bot.topicFilter.aiSettings) bot.topicFilter.aiSettings = { role: '', modelId: '' };
+      bot.topicFilter.aiSettings[field] = value;
+    }
+
+    async function saveConfig() {
+      if (bots.length === 0 || !bots[0].botId || !bots[0].discordToken) {
+        showStatus('请先添加机器人并填写完整信息', 'error');
+        return;
+      }
+
+      showStatus('正在保存配置并连接 Discord...', 'info');
+      addLogSystem('开始连接 Discord...');
+
+      const config = { bots: bots.map(b => ({
+        botId: b.botId,
+        discordToken: b.discordToken,
+        topicFilter: b.topicFilter
+      })) };
+
+      try {
+        const res = await fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config)
+        });
+        const data = await res.json();
+        const tokensWithHidden = data.tokens.map(t => ({ ...t, hidden: true }));
+        sessionStorage.setItem('tokens', JSON.stringify(tokensWithHidden));
+        displayTokens(tokensWithHidden);
+        showStatus('配置已保存！机器人正在连接 Discord...', 'success');
+        addLogSystem('配置已保存，等待机器人连接...');
+      } catch (err) {
+        showStatus('保存失败：' + err.message, 'error');
+        addLogError('保存配置失败：' + err.message);
+      }
+    }
+
+    async function disconnectAll() {
+      if (!confirm('确定要断开所有机器人连接吗？')) return;
+
+      try {
+        await fetch('/api/disconnect', { method: 'POST' });
+        bots.forEach(b => b.connected = false);
+        render();
+        showStatus('所有机器人已断开连接', 'success');
+        addLogSystem('所有机器人已断开连接');
+      } catch (err) {
+        showStatus('断开失败：' + err.message, 'error');
+        addLogError('断开连接失败：' + err.message);
+      }
+    }
+
+    function displayTokens(tokens) {
+      const container = document.getElementById('tokens');
+      container.innerHTML = tokens.map((t, i) =>
+        `<div class="token">
+          <div class="token-value ${t.hidden ? 'token-hidden' : ''}" id="token-${i}">
+            <strong>${t.botId}:</strong> ${t.token}
+          </div>
+          <button class="eye-btn" onclick="toggleToken(${i})">
+            ${t.hidden ? '👁️' : '🙈'}
+          </button>
+        </div>`
+      ).join('');
+    }
+
+    function toggleToken(index) {
+      const tokens = Array.from(document.getElementById('tokens').children);
+      const tokenData = JSON.parse(sessionStorage.getItem('tokens') || '[]');
+      tokenData[index].hidden = !tokenData[index].hidden;
+      sessionStorage.setItem('tokens', JSON.stringify(tokenData));
+      displayTokens(tokenData);
+    }
+
+    async function connectBot(id) {
+      const bot = bots.find(b => b.id === id);
+      if (!bot || !bot.botId || !bot.discordToken) {
+        showStatus('请填写完整信息', 'error');
+        return;
+      }
+
+      try {
+        await fetch('/api/connect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ botId: bot.botId, discordToken: bot.discordToken })
+        });
+        showStatus(`正在连接 ${bot.botId}...`, 'info');
+        addLogSystem(`正在连接机器人 ${bot.botId}...`);
+      } catch (err) {
+        showStatus('连接失败：' + err.message, 'error');
+      }
+    }
+
+    async function disconnectBot(botId) {
+      try {
+        await fetch('/api/disconnect-bot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ botId })
+        });
+        updateBotStatus(botId, false);
+        showStatus(`${botId} 已断开连接`, 'success');
+        addLogSystem(`机器人 ${botId} 已断开连接`);
+      } catch (err) {
+        showStatus('断开失败：' + err.message, 'error');
+      }
+    }
+
+    async function loadConfig() {
+      const res = await fetch('/api/config');
+      const data = await res.json();
+      if (data.bots && data.bots.length > 0) {
+        bots = data.bots.map((b, i) => ({ id: i.toString(), ...b, connected: data.connected || false, showToken: false }));
+        render();
+        if (data.tokens) {
+          const tokensWithHidden = data.tokens.map(([botId, token]) => ({ botId, token, hidden: true }));
+          sessionStorage.setItem('tokens', JSON.stringify(tokensWithHidden));
+          displayTokens(tokensWithHidden);
+        }
+        if (data.connected) {
+          addLogSystem('检测到已有连接的机器人');
+        }
+      } else {
+        addBot();
+      }
+    }
+
+    loadConfig();
+    loadAIModels();
+    connectWebSocket();
+    addLogSystem('Bean Channel 已启动');
+  </script>
+</body>
+</html>
